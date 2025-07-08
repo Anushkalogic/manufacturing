@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Detection Results</title>
+</head>
+<body>
+    <h1>Output Video</h1>
+   <video width="720" height="480" controls>
+    <source src="{{ video_path }}" type="video/mp4">
+    Your browser does not support the video tag.
+</video>
+
+    <h2>Detections</h2>
+    <ul>
+    {% for d in detections %}
+        <li>{{ d }}</li>
+    {% endfor %}
+    </ul>
+</body>
+</html>
