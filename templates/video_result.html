@@ -1,20 +1,73 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Detection Results</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f2f5f9;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2a6ef7;
+        }
+
+        .video-section {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        video {
+            width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .stats {
+            margin-top: 25px;
+            text-align: center;
+        }
+
+        .count-box {
+            display: inline-block;
+            padding: 15px 30px;
+            background: #2a6ef7;
+            color: white;
+            font-size: 22px;
+            font-weight: bold;
+            border-radius: 10px;
+            box-shadow: 0 5px 12px rgba(42, 110, 247, 0.4);
+        }
+    </style>
 </head>
 <body>
-    <h1>Output Video</h1>
-   <video width="720" height="480" controls>
-    <source src="{{ video_path }}" type="video/mp4">
-    Your browser does not support the video tag.
-</video>
+    <div class="container">
+        <h1>Manufacturing Safety Detection</h1>
 
-    <h2>Detections</h2>
-    <ul>
-    {% for d in detections %}
-        <li>{{ d }}</li>
-    {% endfor %}
-    </ul>
+        <div class="video-section">
+            <video controls>
+                <source src="{{ video_path }}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+
+        <div class="stats">
+            <p class="count-box">👤 Persons Detected: {{ person_count }}</p>
+        </div>
+    </div>
 </body>
 </html>

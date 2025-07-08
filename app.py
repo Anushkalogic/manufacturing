@@ -54,8 +54,9 @@ def run_roboflow_pipeline():
         raise RuntimeError("VideoWriter not opened.")
 
     rf = Roboflow(api_key="DiBsOHUZVRTHIOZjUoWJ")
-    project = rf.workspace().project("manufacturing-3nysf")
-    model = project.version(2).model
+    project = rf.workspace().project("manufacturing_base")
+    model = project.version(2).model  # ✅ .model not .mod
+
 
     frame_index = 1
     current_pos = 0
