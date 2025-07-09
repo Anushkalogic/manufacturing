@@ -2,115 +2,463 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Manufacturing Dashboard</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <style>
+    :root {
+      --primary-color: #2c3e50;
+      --secondary-color: #3498db;
+      --accent-color: #e74c3c;
+      --success-color: #27ae60;
+      --warning-color: #f39c12;
+      --background-color: #ecf0f1;
+      --card-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      background-color: #f4f6f9;
-      font-family: 'Segoe UI', sans-serif;
+      background: var(--background-color);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: var(--primary-color);
+      min-height: 100vh;
     }
-    h2 {
+
+    .main-header {
+      background: var(--gradient-primary);
+      padding: 2rem 0;
+      margin-bottom: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .main-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+      pointer-events: none;
+    }
+
+    .main-header h1 {
+      color: white;
+      font-size: 2.5rem;
+      font-weight: 700;
       text-align: center;
-      margin: 30px 0 10px;
+      margin: 0;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+      position: relative;
+      z-index: 1;
     }
-    .alert {
+
+    .main-header .subtitle {
+      color: rgba(255,255,255,0.9);
+      text-align: center;
       font-size: 1.1rem;
+      margin-top: 0.5rem;
+      position: relative;
+      z-index: 1;
     }
-    .chart-card {
-    background: #fff;
-    padding: 20px; /* ✅ Padding added here */
-    border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-    width: 100%;
-    max-width: 500px;
+
+    .alert-custom {
+      background: var(--gradient-secondary);
+      border: none;
+      border-radius: 15px;
+      padding: 1.5rem;
+      margin: 2rem auto;
+      max-width: 600px;
+      box-shadow: var(--card-shadow);
+      animation: pulse 2s infinite;
     }
-    .dashboard-row {
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+      100% { transform: scale(1); }
+    }
+
+    .alert-custom .alert-icon {
+      font-size: 2rem;
+      margin-right: 1rem;
+      animation: bounce 1s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-10px); }
+      60% { transform: translateY(-5px); }
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+      gap: 2rem;
+      margin: 2rem 0;
+    }
+
+    .card-modern {
+      background: white;
+      border-radius: 20px;
+      padding: 2rem;
+      box-shadow: var(--card-shadow);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-modern::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--gradient-primary);
+    }
+
+    .card-modern:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+    }
+
+    .card-header {
       display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 30px;
-      margin-top: 30px;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #f8f9fa;
     }
-    .video-card, .chart-card {
-      background: #fff;
-      padding: 20px;
+
+    .card-header h5 {
+      margin: 0;
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+
+    .card-header .icon {
+      font-size: 1.5rem;
+      margin-right: 0.75rem;
+      color: var(--secondary-color);
+    }
+
+    .video-container {
+      position: relative;
       border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-      width: 100%;
-      max-width: 500px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     }
-    video {
+
+    .video-container video {
       width: 100%;
-      border-radius: 8px;
+      height: auto;
+      display: block;
     }
-    .counts-box {
-      background: #fff;
-      margin: 40px auto 20px;
-      padding: 20px;
+
+    .chart-container {
+      position: relative;
+      height: 400px;
+      padding: 1rem;
+    }
+
+    .counts-section {
+      background: white;
+      border-radius: 20px;
+      padding: 2rem;
+      margin: 2rem 0;
+      box-shadow: var(--card-shadow);
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .counts-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--gradient-primary);
+    }
+
+    .counts-section {
+      position: relative;
+    }
+
+    .counts-header {
+      text-align: center;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+
+    .counts-header h4 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      margin: 0;
+    }
+
+    .counts-header .underline {
+      width: 60px;
+      height: 3px;
+      background: var(--gradient-primary);
+      margin: 0.5rem auto;
+      border-radius: 2px;
+    }
+
+    .count-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 1.5rem;
+      margin: 0.5rem 0;
+      background: #f8f9fa;
       border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      max-width: 800px;
+      border: none;
+      transition: all 0.3s ease;
     }
-    .list-group-item {
-      font-size: 1.05rem;
+
+    .count-item:hover {
+      background: #e9ecef;
+      transform: translateX(5px);
+    }
+
+    .count-item .label {
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: var(--primary-color);
+    }
+
+    .count-badge {
+      background: var(--gradient-primary);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 25px;
+      font-weight: 600;
+      font-size: 1rem;
+      min-width: 50px;
+      text-align: center;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+    }
+
+    .count-badge.phone-alert {
+      background: var(--gradient-secondary);
+      animation: glow 2s infinite;
+    }
+
+    @keyframes glow {
+      0% { box-shadow: 0 3px 10px rgba(231, 76, 60, 0.3); }
+      50% { box-shadow: 0 6px 20px rgba(231, 76, 60, 0.6); }
+      100% { box-shadow: 0 3px 10px rgba(231, 76, 60, 0.3); }
+    }
+
+    .loading-spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid var(--secondary-color);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+
+    .stat-card {
+      background: var(--gradient-primary);
+      color: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .stat-card .number {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-card .label {
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+
+    @media (max-width: 768px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .main-header h1 {
+        font-size: 2rem;
+      }
+      
+      .card-modern {
+        padding: 1.5rem;
+      }
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--secondary-color);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--primary-color);
     }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <h2>🛠 Manufacturing Detection Dashboard</h2>
+  <div class="main-header">
+    <div class="container">
+      <h1><i class="fas fa-industry"></i> Manufacturing Detection Dashboard</h1>
+      <p class="subtitle">Real-time monitoring and analysis system</p>
+    </div>
+  </div>
 
+  <div class="container">
     {% if phone_alert %}
-    <div class="alert alert-danger text-center fw-bold" role="alert">
-      📱 ALERT: Someone was detected using a phone!
+    <div class="alert-custom text-center">
+      <i class="fas fa-mobile-alt alert-icon"></i>
+      <strong style="color: white; font-size: 1.2rem;">
+        SECURITY ALERT: Unauthorized phone usage detected!
+      </strong>
     </div>
     {% endif %}
 
-    <div class="dashboard-row">
+    <div class="dashboard-grid">
       <!-- Video Section -->
-      <div class="video-card">
-        <h5 class="mb-3 text-center">🎥 Processed Video</h5>
-        <video controls>
-          <source src="{{ video_path }}" type="video/mp4">
-          Your browser does not support the video tag.
-        </video>
+      <div class="card-modern">
+        <div class="card-header">
+          <i class="fas fa-video icon"></i>
+          <h5>Live Video Feed</h5>
+        </div>
+        <div class="video-container">
+          <video controls preload="metadata">
+            <source src="{{ video_path }}" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
       </div>
 
-      <!-- Bar Chart Section -->
-      <div class="chart-card">
-                <canvas id="barChart" height="320" style="padding: 10px;"></canvas>
-
-        <h5 class="mb-3 text-center">📊 Detection Chart</h5>
-        <canvas id="barChart" height="320"></canvas>
+      <!-- Chart Section -->
+      <div class="card-modern">
+        <div class="card-header">
+          <i class="fas fa-chart-bar icon"></i>
+          <h5>Detection Analytics</h5>
+        </div>
+        <div class="chart-container">
+          <canvas id="barChart"></canvas>
+        </div>
       </div>
     </div>
 
-    <!-- Count List Section -->
-    <div class="counts-box">
-        
-      <h4 class="text-center mb-3">🔢 Detection Counts</h4>
-      <ul class="list-group list-group-flush">
+    <!-- Statistics Overview -->
+    <div class="card-modern">
+      <div class="card-header">
+        <i class="fas fa-tachometer-alt icon"></i>
+        <h5>System Overview</h5>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="number" id="totalDetections">0</div>
+          <div class="label">Total Detections</div>
+        </div>
+        <div class="stat-card">
+          <div class="number" id="phoneAlerts">0</div>
+          <div class="label">Phone Alerts</div>
+        </div>
+        <div class="stat-card">
+          <div class="number" id="activeMonitoring">
+            <i class="fas fa-circle" style="color: #27ae60;"></i>
+          </div>
+          <div class="label">System Status</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detailed Counts Section -->
+    <div class="counts-section">
+      <div class="counts-header">
+        <h4><i class="fas fa-list-ul"></i> Detection Summary</h4>
+        <div class="underline"></div>
+      </div>
+      <div class="counts-list">
         {% for label, count in counts.items() %}
-        <li class="list-group-item d-flex justify-content-between align-items-center">
-          <strong>{{ label }}</strong>
-          <span class="badge bg-primary rounded-pill">{{ count }}</span>
-        </li>
+        <div class="count-item">
+          <span class="label">
+            {% if 'phone' in label.lower() %}
+            <i class="fas fa-mobile-alt" style="color: #e74c3c; margin-right: 0.5rem;"></i>
+            {% else %}
+            <i class="fas fa-eye" style="color: #3498db; margin-right: 0.5rem;"></i>
+            {% endif %}
+            {{ label }}
+          </span>
+          <span class="count-badge {% if 'phone' in label.lower() %}phone-alert{% endif %}">
+            {{ count }}
+          </span>
+        </div>
         {% endfor %}
-      </ul>
+      </div>
     </div>
   </div>
 
   <script>
+    // Chart.js configuration with enhanced styling
     const labels = JSON.parse('{{ counts.keys()|list|tojson|safe }}');
     const data = JSON.parse('{{ counts.values()|list|tojson|safe }}');
 
-    const backgroundColors = labels.map(label =>
-      label.toLowerCase().includes("phone") ? '#dc3545' : '#007bff'
-    );
-
+    // Create gradient colors for bars
     const ctx = document.getElementById('barChart').getContext('2d');
+    
+    const gradientColors = labels.map(label => {
+      if (label.toLowerCase().includes("phone")) {
+        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, '#ff6b6b');
+        gradient.addColorStop(1, '#ee5a52');
+        return gradient;
+      } else {
+        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, '#4ecdc4');
+        gradient.addColorStop(1, '#44a08d');
+        return gradient;
+      }
+    });
+
     new Chart(ctx, {
       type: 'bar',
       data: {
@@ -118,21 +466,33 @@
         datasets: [{
           label: 'Detections',
           data: data,
-          backgroundColor: backgroundColors,
-          borderRadius: 6
+          backgroundColor: gradientColors,
+          borderColor: 'rgba(255, 255, 255, 0.8)',
+          borderWidth: 2,
+          borderRadius: 8,
+          borderSkipped: false,
         }]
       },
       options: {
+        responsive: true,
+        maintainAspectRatio: false,
         animation: {
-          duration: 1000,
-          easing: 'easeOutQuart'
+          duration: 2000,
+          easing: 'easeInOutQuart'
         },
         plugins: {
-          legend: { display: false },
+          legend: { 
+            display: false 
+          },
           tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            titleColor: 'white',
+            bodyColor: 'white',
+            cornerRadius: 8,
+            displayColors: false,
             callbacks: {
-              label: function(ctx) {
-                return `${ctx.label}: ${ctx.parsed.y}`;
+              label: function(context) {
+                return `${context.label}: ${context.parsed.y} detections`;
               }
             }
           }
@@ -140,19 +500,68 @@
         scales: {
           y: {
             beginAtZero: true,
+            grid: {
+              color: 'rgba(0, 0, 0, 0.1)',
+              lineWidth: 1
+            },
+            ticks: {
+              color: '#666',
+              font: {
+                size: 12
+              }
+            },
             title: {
               display: true,
-              text: 'Count'
+              text: 'Number of Detections',
+              color: '#333',
+              font: {
+                size: 14,
+                weight: 'bold'
+              }
             }
           },
           x: {
+            grid: {
+              display: false
+            },
+            ticks: {
+              color: '#666',
+              font: {
+                size: 12
+              }
+            },
             title: {
               display: true,
-              text: 'Classes'
+              text: 'Detection Categories',
+              color: '#333',
+              font: {
+                size: 14,
+                weight: 'bold'
+              }
             }
           }
         }
       }
+    });
+
+    // Update statistics
+    document.addEventListener('DOMContentLoaded', function() {
+      const totalDetections = data.reduce((sum, count) => sum + count, 0);
+      const phoneAlerts = data[labels.findIndex(label => label.toLowerCase().includes('phone'))] || 0;
+      
+      document.getElementById('totalDetections').textContent = totalDetections;
+      document.getElementById('phoneAlerts').textContent = phoneAlerts;
+    });
+
+    // Add some interactive animations
+    document.querySelectorAll('.count-item').forEach(item => {
+      item.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateX(10px) scale(1.02)';
+      });
+      
+      item.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateX(0) scale(1)';
+      });
     });
   </script>
 
